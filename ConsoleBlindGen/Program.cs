@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using BlindGen2;
 
 namespace ConsoleBlindGen
@@ -47,7 +48,31 @@ namespace ConsoleBlindGen
                         string text = Console.ReadLine();
                         notNumber = !Int32.TryParse(text, out number);
                     } while (notNumber);
-                    controller.Generator.GenerateBlindtest(number);
+                    Console.WriteLine("Voulez vous spécifier une ou plusieurs catégorie spécifique : (y/n)");
+                    if(Console.ReadLine().ToLower().First() == 'y')
+                    {
+                        List<Categorie> categories = new List<Categorie>();
+                        string catChoice;
+                        do
+                        {
+                            Console.WriteLine("Veuillez choisir une categorie ou taper quit pour terminer le choix :");
+                            catChoice = Console.ReadLine().ToUpper();
+                            if (Enum.TryParse<Categorie>(catChoice, out Categorie categorie) && !categories.Contains(categorie))
+                            {
+                                categories.Add(categorie);
+                                Console.WriteLine("Catégorie ajouté avec succès !");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Nom de catégorie invalide !");
+                            }
+                        } while (!catChoice.Equals("QUIT"));
+                        controller.Generator.GenerateBlindtest(number, categories);
+                    }
+                    else
+                    {
+                        controller.Generator.GenerateBlindtest(number);
+                    }
                 }else if (action.Equals("add"))
                 {
                     Console.WriteLine("Oeuvre :");

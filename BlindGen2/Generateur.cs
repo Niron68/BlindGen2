@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace BlindGen2
@@ -112,6 +113,29 @@ namespace BlindGen2
             return res;
         }
 
+        public List<Musique> createRandomList(int nb, Categorie[] categorie)
+        {
+            List<Musique> res = new List<Musique>();
+            List<Musique> musiqueList = Musiques.FindAll(mus => categorie.Contains(mus.Info.Categorie));
+            Random rand = new Random();
+            int max = nb;
+            if (nb > GetNombreOeuvre(musiqueList))
+                max = GetNombreOeuvre(musiqueList);
+            for (int i = 0; i < max; i++)
+            {
+                bool stop;
+                Musique musique;
+                do
+                {
+                    int r = rand.Next(musiqueList.Count);
+                    musique = musiqueList[r];
+                    stop = res.Exists(mus => mus.SameOeuvre(musique));
+                } while (stop);
+                res.Add(musique);
+            }
+            return res;
+        }
+
         public int ToDownload(List<Musique> musiques)
         {
             int res = 0;
@@ -149,7 +173,35 @@ namespace BlindGen2
             Renderer.ConcatMusique(musiques);
         }
 
+        public void GenerateBlindtest(int nb, List<Categorie> categories)
+        {
+            List<Musique> musiques = createRandomList(nb, categories.ToArray());
+            DownloadMusiques(musiques);
+            foreach (Musique mus in musiques)
+            {
+                Renderer.CutVideo(mus.Chemin, mus.CheminTemp, 10, 15);
+                Renderer.CutVideo(mus.Chemin, mus.CheminSon, 0, 15);
+                Renderer.CreateExtract(mus, "Video\\decompte.mp4");
+            }
+            Renderer.ConcatMusique(musiques);
+        }
+
         public bool ContainsMusique(string url) => Musiques.Exists(mus => mus.Info.Url.Equals(url));
+
+        public int GetNombreOeuvre(List<Musique> musiques)
+        {
+            int res = 0;
+            List<string> oeuvres = new List<string>();
+            foreach (Musique mus in musiques)
+            {
+                if (!oeuvres.Contains(mus.Info.Oeuvre))
+                {
+                    res++;
+                    oeuvres.Add(mus.Info.Oeuvre);
+                }
+            }
+            return res;
+        }
 
     }
 }
