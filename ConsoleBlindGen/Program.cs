@@ -13,7 +13,7 @@ namespace ConsoleBlindGen
             controller.Generator.Downloader.Update();
             while (true)
             {
-                Console.WriteLine("Que voulez-vous faire : (add/create/quit/upload)");
+                Console.WriteLine("Que voulez-vous faire : (add/create/quit)");
                 string action;
                 bool redo;
                 do
