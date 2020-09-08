@@ -9,11 +9,11 @@ namespace ConsoleBlindGen
     {
         static void Main(string[] args)
         {
+            Controller controller = new Controller();
+            controller.Generator.Downloader.Update();
             while (true)
             {
-                Controller controller = new Controller();
-                controller.Generator.Downloader.Update();
-                Console.WriteLine("Que voulez-vous faire : (add/create/quit)");
+                Console.WriteLine("Que voulez-vous faire : (add/create/quit/upload)");
                 string action;
                 bool redo;
                 do
@@ -39,6 +39,11 @@ namespace ConsoleBlindGen
                     return;
                 if (action.Equals("create"))
                 {
+                    string name = "[Blindtest] ";
+                    List<string> tags = new List<string>();
+                    tags.Add("blindtest");
+                    tags.Add("extrait");
+                    string path;
                     Console.Clear();
                     Console.WriteLine("Combien d'extrait ?");
                     bool notNumber;
@@ -48,6 +53,8 @@ namespace ConsoleBlindGen
                         string text = Console.ReadLine();
                         notNumber = !Int32.TryParse(text, out number);
                     } while (notNumber);
+                    name += number + " Extraits";
+                    tags.Add(number.ToString());
                     Console.WriteLine("Voulez vous spécifier une ou plusieurs catégorie spécifique : (y/n)");
                     if(Console.ReadLine().ToLower().First() == 'y')
                     {
@@ -67,13 +74,35 @@ namespace ConsoleBlindGen
                                 Console.WriteLine("Nom de catégorie invalide !");
                             }
                         } while (!catChoice.Equals("QUIT"));
-                        controller.Generator.GenerateBlindtest(number, categories);
+                        name += " - ";
+                        foreach(var cat in categories)
+                        {
+                            name += cat.ToString() + "/";
+                            tags.Add(cat.ToString());
+                        }
+                        name = name.Remove(name.Length - 1);
+                        path = controller.Generator.GenerateBlindtest(number, categories);
                     }
                     else
                     {
-                        controller.Generator.GenerateBlindtest(number);
+                        name += " - Toutes catégories";
+                        path = controller.Generator.GenerateBlindtest(number);
                     }
-                }else if (action.Equals("add"))
+                    Console.WriteLine("Voulez vous upload la vidéo ? (y/n)");
+                    if (Console.ReadLine().ToLower().First() == 'y')
+                    {
+                        VideoInfo info = new VideoInfo()
+                        {
+                            Title = name,
+                            Path = path,
+                            Privacy = "private",
+                            Tags = tags.ToArray(),
+                            Description = "Voici un petit blindtest, j'éspère qu'il vous amuseras. N'hésitez pas à commenter votre score et me suggérer des oeuvres pour les prochain !\n Abonne-toi pour ne pas rater les prochains et met un pouce bleu si tu as aimé ce blindtest"
+                        };
+                        controller.YTBUploader.Upload(info).Wait();
+                    }
+                }
+                else if (action.Equals("add"))
                 {
                     Console.WriteLine("Oeuvre :");
                     string oeuvre = Console.ReadLine();

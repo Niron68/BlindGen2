@@ -160,7 +160,7 @@ namespace BlindGen2
             }
         }
 
-        public void GenerateBlindtest(int nb)
+        public string GenerateBlindtest(int nb)
         {
             List<Musique> musiques = createRandomList(nb);
             DownloadMusiques(musiques);
@@ -170,10 +170,10 @@ namespace BlindGen2
                 Renderer.CutVideo(mus.Chemin, mus.CheminSon, 0, 15);
                 Renderer.CreateExtract(mus, "Video\\decompte.mp4");
             }
-            Renderer.ConcatMusique(musiques);
+            return Renderer.ConcatMusique(musiques);
         }
 
-        public void GenerateBlindtest(int nb, List<Categorie> categories)
+        public string GenerateBlindtest(int nb, List<Categorie> categories)
         {
             List<Musique> musiques = createRandomList(nb, categories.ToArray());
             DownloadMusiques(musiques);
@@ -183,7 +183,7 @@ namespace BlindGen2
                 Renderer.CutVideo(mus.Chemin, mus.CheminSon, 0, 15);
                 Renderer.CreateExtract(mus, "Video\\decompte.mp4");
             }
-            Renderer.ConcatMusique(musiques);
+            return Renderer.ConcatMusique(musiques);
         }
 
         public bool ContainsMusique(string url) => Musiques.Exists(mus => mus.Info.Url.Equals(url));

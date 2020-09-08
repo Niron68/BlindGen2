@@ -56,7 +56,7 @@ namespace BlindGen2
             ffmpeg.WaitForExit();
         }
         
-        public void ConcatMusique(List<Musique> musiques, string outputFolder = "Blindtest")
+        public string ConcatMusique(List<Musique> musiques, string outputFolder = "Blindtest")
         {
             string name = Path.Combine(outputFolder, DateTime.Now.Ticks.ToString());
             string args = "";
@@ -73,6 +73,7 @@ namespace BlindGen2
             ffmpeg.StartInfo.Arguments = args;
             ffmpeg.Start();
             ffmpeg.WaitForExit();
+            return name + ".mp4";
         }
 
     }
